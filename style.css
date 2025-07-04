@@ -1,11 +1,11 @@
 body {
-  background: #e0f2f1;
+  background: lightcyan;
   text-align: center;
   margin-top: 100px;
 }
 
 .container {
-  background: #ffffff;
+  background: white;
   padding: 30px;
   border-radius: 10px;
   display: inline-block;
