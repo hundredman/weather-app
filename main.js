@@ -9,14 +9,14 @@ input.addEventListener("keydown", function (event) {
 button.addEventListener("click", getWeather);
 
 function getWeatherInfo(code) {
-    if (code === 0) return { icon: "☀️", text: "Clear" };
-    if (code <= 3) return { icon: "🌤️", text: "Mostly Sunny" };
-    if (code <= 48) return { icon: "🌫️", text: "Fog" };
-    if (code <= 67) return { icon: "🌧️", text: "Rain" };
-    if (code <= 77) return { icon: "🌨️", text: "Snow" };
-    if (code <= 82) return { icon: "🌦️", text: "Showers" };
-    if (code >= 95) return { icon: "⛈️", text: "Thunderstorm" };
-    return { icon: "❓", text: "Unknown" };
+    if (code === 0) return { icon: "☀️", text: "Clear", color: "gold" };
+    if (code <= 3) return { icon: "🌤️", text: "Mostly Sunny", color: "khaki" };
+    if (code <= 48) return { icon: "🌫️", text: "Fog", color: "darkgray" };
+    if (code <= 67) return { icon: "🌧️", text: "Rain", color: "dodgerblue" };
+    if (code <= 77) return { icon: "🌨️", text: "Snow", color: "lightblue" };
+    if (code <= 82) return { icon: "🌦️", text: "Showers", color: "skyblue" };
+    if (code >= 95) return { icon: "⛈️", text: "Thunderstorm", color: "purple" };
+    return { icon: "❓", text: "Unknown", color: "lightgray" };
 }
 
 async function getWeather() {
@@ -44,6 +44,9 @@ async function getWeather() {
         const weatherIcon = getWeatherInfo(weatherCode).icon;
         const description = getWeatherInfo(weatherCode).text;
         const temperature = weatherData.current.temperature_2m;
+        const bgColor = getWeatherInfo(weatherCode).color;
+        
+        document.body.style.backgroundColor = bgColor;
 
         result.innerHTML = `
             <h2>${display_name}</h2>
