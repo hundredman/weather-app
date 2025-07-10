@@ -1,4 +1,4 @@
-const input = document.getElementById("cityInput");
+const input = document.getElementById("locInput");
 const button = document.getElementById("searchButton");
 
 input.addEventListener("keydown", function (event) {
@@ -20,7 +20,7 @@ function getWeatherInfo(code) {
 }
 
 async function getWeather() {
-    const city = document.getElementById("cityInput").value.trim();
+    const loc = document.getElementById("locInput").value.trim();
     const result = document.getElementById("weatherDiv");
 
     result.innerHTML = "Please wait a moment...";
@@ -28,9 +28,9 @@ async function getWeather() {
     try {
         let lat, lon, display_name;
 
-        if (city) {
+        if (loc) {
             // 입력한 도시로 위치 찾기
-            const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json`;
+            const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc)}&format=json`;
             const geoRes = await fetch(geoUrl);
             const geoData = await geoRes.json();
 
