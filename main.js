@@ -22,38 +22,49 @@ function getWeatherInfo(code) {
 async function getWeather() {
     const city = document.getElementById("cityInput").value.trim();
     const result = document.getElementById("weatherDiv");
-    if (!city) {
-        result.innerHTML = "Please enter a city.";
-    }
+
     result.innerHTML = "Please wait a moment...";
 
     try {
-        const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json`;
-        const geoRes = await fetch(geoUrl);
-        const geoData = await geoRes.json();
-        if (!geoData.length) {
-            result.innerHTML = "No locations found.";
-            return;
-        }
-        const { lat, lon, display_name } = geoData[0];
+        let lat, lon, display_name;
 
+        if (city) {
+            // 입력한 도시로 위치 찾기
+            const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json`;
+            const geoRes = await fetch(geoUrl);
+            const geoData = await geoRes.json();
+
+            if (!geoData.length) {
+                result.innerHTML = "No locations found.";
+                return;
+            }
+
+            ({ lat, lon, display_name } = geoData[0]);
+        } else {
+            // 현재 위치 사용
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
+            lat = position.coords.latitude;
+            lon = position.coords.longitude;
+            display_name = "Your Current Location";
+        }
+
+        // 날씨 API 사용
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,temperature_2m`;
         const weatherRes = await fetch(weatherUrl);
         const weatherData = await weatherRes.json();
         const weatherCode = weatherData.current.weather_code;
-        const weatherIcon = getWeatherInfo(weatherCode).icon;
-        const description = getWeatherInfo(weatherCode).text;
-        const temperature = weatherData.current.temperature_2m;
-        const bgColor = getWeatherInfo(weatherCode).color;
-        
-        document.body.style.backgroundColor = bgColor;
+        const weatherInfo = getWeatherInfo(weatherCode);
+
+        document.body.style.backgroundColor = weatherInfo.color;
 
         result.innerHTML = `
             <h2>${display_name}</h2>
-            <div class="weather-icon">${weatherIcon}</div>
+            <div class="weather-icon">${weatherInfo.icon}</div>
             <div class="weather-text">
-                <p>Temperature: ${temperature}°C</p>
-                <p>Description: ${description}</p>
+                <p>Temperature: ${weatherData.current.temperature_2m}°C</p>
+                <p>Description: ${weatherInfo.text}</p>
             </div>
         `;
     } catch (error) {
@@ -61,3 +72,6 @@ async function getWeather() {
         console.error(error);
     }
 }
+
+// 페이지 로드시 현재 위치로 날씨 자동 조회
+window.addEventListener("load", getWeather);
