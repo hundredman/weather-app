@@ -29,7 +29,7 @@ async function getWeather() {
         let lat, lon, display_name;
 
         if (loc) {
-            // 입력한 도시로 위치 찾기
+            // 입력한 위치 찾기
             const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc)}&format=json`;
             const geoRes = await fetch(geoUrl);
             const geoData = await geoRes.json();
