@@ -51,11 +51,11 @@ async function getWeather() {
         }
 
         // 날씨 API 사용
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,temperature_2m`;
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,temperature_2m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
         const weatherRes = await fetch(weatherUrl);
         const weatherData = await weatherRes.json();
-        const weatherCode = weatherData.current.weather_code;
-        const weatherInfo = getWeatherInfo(weatherCode);
+        const { current, hourly, daily } = weatherData;
+        const weatherInfo = getWeatherInfo(current.weather_code);
 
         document.body.style.backgroundColor = weatherInfo.color;
 
@@ -63,15 +63,68 @@ async function getWeather() {
             <h2>${display_name}</h2>
             <div class="weather-icon">${weatherInfo.icon}</div>
             <div class="weather-text">
-                <p>Temperature: ${weatherData.current.temperature_2m}°C</p>
+                <p>Temperature: ${current.temperature_2m}°C</p>
                 <p>Description: ${weatherInfo.text}</p>
             </div>
+            <div id="hourly-forecast"></div>
+            <div id="daily-forecast"></div>
         `;
+
+        displayHourlyForecast(hourly);
+        displayDailyForecast(daily);
+
     } catch (error) {
         result.innerHTML = "Error fetching weather.";
         console.error(error);
     }
 }
+
+function displayHourlyForecast(hourly) {
+    const forecastDiv = document.getElementById("hourly-forecast");
+    let html = "<h3>Hourly Forecast</h3><div class='forecast-container'>";
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    // Find the index for the current hour
+    const startIndex = hourly.time.findIndex(t => new Date(t).getHours() === currentHour);
+
+    if (startIndex === -1) return; // Should not happen with timezone=auto
+
+    // Display the next 24 hours
+    for (let i = startIndex; i < startIndex + 24; i++) {
+        if (i >= hourly.time.length) break;
+        const time = new Date(hourly.time[i]);
+        const weatherInfo = getWeatherInfo(hourly.weather_code[i]);
+        html += `
+            <div class="forecast-item">
+                <p>${time.getHours()}:00</p>
+                <div class="forecast-icon">${weatherInfo.icon}</div>
+                <p>${hourly.temperature_2m[i]}°C</p>
+            </div>
+        `;
+    }
+    html += "</div>";
+    forecastDiv.innerHTML = html;
+}
+
+function displayDailyForecast(daily) {
+    const forecastDiv = document.getElementById("daily-forecast");
+    let html = "<h3>Weekly Forecast</h3><div class='forecast-container'>";
+    for (let i = 0; i < daily.time.length; i++) {
+        const date = new Date(daily.time[i]);
+        const weatherInfo = getWeatherInfo(daily.weather_code[i]);
+        html += `
+            <div class="forecast-item">
+                <p>${date.toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                <div class="forecast-icon">${weatherInfo.icon}</div>
+                <p>${daily.temperature_2m_max[i]}° / ${daily.temperature_2m_min[i]}°</p>
+            </div>
+        `;
+    }
+    html += "</div>";
+    forecastDiv.innerHTML = html;
+}
+
 
 // 페이지 로드시 현재 위치로 날씨 자동 조회
 window.addEventListener("load", getWeather);
