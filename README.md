@@ -4,7 +4,7 @@
 
 ## 💡 프로젝트 소개
 
-**Crystal Cast**는 순수 HTML, CSS, JavaScript로 만든 날씨 웹 앱입니다. 글래스모피즘 디자인을 적용했고, 날씨에 따라 배경 이미지와 아이콘이 동적으로 변합니다.
+**Crystal Cast**는 순수 HTML, CSS, JavaScript로 만든 날씨 웹 앱입니다. Glassmorphism 디자인을 적용했고, 날씨에 따라 배경 이미지와 아이콘이 동적으로 변합니다.
 
 ## ✨ 주요 기능
 
