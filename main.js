@@ -1,6 +1,6 @@
 const input = document.getElementById("locInput");
 const button = document.getElementById("searchButton");
-const weatherContent = document.querySelector('.weather-content');
+const weatherApp = document.querySelector('.weather-app');
 const unsplashAccessKey = 'S-JGWTKlDt7pIdCYOvApqDfezdgvE-qxldkdwfDqs8w';
 
 input.addEventListener("keydown", function (event) {
@@ -11,39 +11,51 @@ input.addEventListener("keydown", function (event) {
 button.addEventListener("click", getWeather);
 
 const weatherConditions = {
-    0: { icon: 'sun', text: 'Clear Sky' },
-    1: { icon: 'sun', text: 'Mainly Clear' },
-    2: { icon: 'cloud', text: 'Partly Cloudy' },
-    3: { icon: 'cloud', text: 'Overcast' },
-    45: { icon: 'wind', text: 'Fog' },
-    48: { icon: 'wind', text: 'Depositing Rime Fog' },
-    51: { icon: 'cloud-drizzle', text: 'Light Drizzle' },
-    53: { icon: 'cloud-drizzle', text: 'Moderate Drizzle' },
-    55: { icon: 'cloud-drizzle', text: 'Dense Drizzle' },
-    61: { icon: 'cloud-rain', text: 'Slight Rain' },
-    63: { icon: 'cloud-rain', text: 'Moderate Rain' },
-    65: { icon: 'cloud-rain', text: 'Heavy Rain' },
-    71: { icon: 'cloud-snow', text: 'Slight Snowfall' },
-    73: { icon: 'cloud-snow', text: 'Moderate Snowfall' },
-    75: { icon: 'cloud-snow', text: 'Heavy Snowfall' },
-    80: { icon: 'cloud-lightning', text: 'Slight Rain Showers' },
-    81: { icon: 'cloud-lightning', text: 'Moderate Rain Showers' },
-    82: { icon: 'cloud-lightning', text: 'Violent Rain Showers' },
-    95: { icon: 'cloud-lightning', text: 'Thunderstorm' },
+    0: { icon: 'sun', text: 'Clear Sky', query: 'clear blue sky' },
+    1: { icon: 'sun', text: 'Mainly Clear', query: 'clear sky' },
+    2: { icon: 'cloud', text: 'Partly Cloudy', query: 'partly cloudy sky' },
+    3: { icon: 'cloud', text: 'Overcast', query: 'overcast sky' },
+    45: { icon: 'wind', text: 'Fog', query: 'foggy weather' },
+    48: { icon: 'wind', text: 'Depositing Rime Fog', query: 'frosty fog' },
+    51: { icon: 'cloud-drizzle', text: 'Light Drizzle', query: 'light rain drizzle' },
+    53: { icon: 'cloud-drizzle', text: 'Moderate Drizzle', query: 'drizzle rain' },
+    55: { icon: 'cloud-drizzle', text: 'Dense Drizzle', query: 'heavy drizzle' },
+    61: { icon: 'cloud-rain', text: 'Slight Rain', query: 'light rain weather' },
+    63: { icon: 'cloud-rain', text: 'Moderate Rain', query: 'rainy day' },
+    65: { icon: 'cloud-rain', text: 'Heavy Rain', query: 'heavy rain storm' },
+    71: { icon: 'cloud-snow', text: 'Slight Snowfall', query: 'light snow' },
+    73: { icon: 'cloud-snow', text: 'Moderate Snowfall', query: 'snowy landscape' },
+    75: { icon: 'cloud-snow', text: 'Heavy Snowfall', query: 'heavy snowfall winter' },
+    80: { icon: 'cloud-lightning', text: 'Slight Rain Showers', query: 'rain showers' },
+    81: { icon: 'cloud-lightning', text: 'Moderate Rain Showers', query: 'rain showers' },
+    82: { icon: 'cloud-lightning', text: 'Violent Rain Showers', query: 'violent storm' },
+    95: { icon: 'cloud-lightning', text: 'Thunderstorm', query: 'thunderstorm lightning' },
 };
 
 function getWeatherInfo(code) {
-    return weatherConditions[code] || { icon: 'help-circle', text: 'Unknown' };
+    return weatherConditions[code] || { icon: 'help-circle', text: 'Unknown', query: 'weather' };
 }
 
 async function getBackgroundImage(query) {
+    const cacheKey = `bg_image_${query.replace(/\s/g, '_')}`;
+    const cachedData = localStorage.getItem(cacheKey);
+
+    if (cachedData) {
+        const { url, timestamp } = JSON.parse(cachedData);
+        // Cache for 1 hour
+        if (Date.now() - timestamp < 3600000) {
+            return url;
+        }
+    }
+
     try {
         const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&orientation=landscape&client_id=${unsplashAccessKey}`);
         const data = await response.json();
-        if (data.urls && data.urls.full) {
-            return data.urls.full;
+        if (data.urls && data.urls.regular) {
+            const imageUrl = data.urls.regular;
+            localStorage.setItem(cacheKey, JSON.stringify({ url: imageUrl, timestamp: Date.now() }));
+            return imageUrl;
         } else {
-            // Fallback image if no specific image is found
             return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
         }
     } catch (error) {
@@ -52,8 +64,17 @@ async function getBackgroundImage(query) {
     }
 }
 
-function createIcon(iconName) {
-    return `<i data-feather="${iconName}" class="forecast-icon"></i>`;
+function preloadImage(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = resolve;
+        img.onerror = reject;
+    });
+}
+
+function createIcon(iconName, className) {
+    return `<i data-feather="${iconName}" class="${className}"></i>`;
 }
 
 async function getWeather() {
@@ -63,8 +84,11 @@ async function getWeather() {
     const dailyDiv = document.getElementById("daily-forecast");
     const loader = document.getElementById("loader");
 
-    weatherContent.classList.remove('visible');
+    weatherApp.classList.remove('visible');
     loader.style.display = "block";
+    resultDiv.innerHTML = "";
+    hourlyDiv.innerHTML = "";
+    dailyDiv.innerHTML = "";
 
     try {
         let lat, lon, display_name;
@@ -77,7 +101,7 @@ async function getWeather() {
             if (!geoData.length) {
                 resultDiv.innerHTML = "<h2>Location not found</h2>";
                 loader.style.display = "none";
-                weatherContent.classList.add('visible');
+                weatherApp.classList.add('visible');
                 return;
             }
             ({ lat, lon, display_name } = geoData[0]);
@@ -96,7 +120,8 @@ async function getWeather() {
         const { current, hourly, daily } = weatherData;
         const weatherInfo = getWeatherInfo(current.weather_code);
 
-        const backgroundImageUrl = await getBackgroundImage(weatherInfo.text);
+        const backgroundImageUrl = await getBackgroundImage(weatherInfo.query);
+        await preloadImage(backgroundImageUrl);
         document.body.style.backgroundImage = `url('${backgroundImageUrl}')`;
 
         let formatted_display_name;
@@ -105,13 +130,7 @@ async function getWeather() {
         } else {
             const parts = display_name.split(',').map(part => part.trim());
             if (parts.length > 1) {
-                const firstPart = parts[0];
-                const lastPart = parts[parts.length - 1];
-                if (firstPart === lastPart) {
-                    formatted_display_name = firstPart;
-                } else {
-                    formatted_display_name = `${firstPart}, ${lastPart}`;
-                }
+                formatted_display_name = `${parts[0]}, ${parts[parts.length - 1]}`;
             } else {
                 formatted_display_name = display_name;
             }
@@ -119,7 +138,7 @@ async function getWeather() {
 
         resultDiv.innerHTML = `
             <h2>${formatted_display_name}</h2>
-            <div class="weather-icon">${createIcon(weatherInfo.icon)}</div>
+            ${createIcon(weatherInfo.icon, 'main-weather-icon')}
             <div class="weather-text">
                 <p>${Math.round(current.temperature_2m)}°C</p>
                 <p>${weatherInfo.text}</p>
@@ -130,13 +149,13 @@ async function getWeather() {
         displayDailyForecast(daily);
 
         loader.style.display = "none";
-        weatherContent.classList.add('visible');
+        weatherApp.classList.add('visible');
         feather.replace();
 
     } catch (error) {
         loader.style.display = "none";
         resultDiv.innerHTML = "<h2>Could not fetch weather data.</h2><p>Please try again or check your connection.</p>";
-        weatherContent.classList.add('visible');
+        weatherApp.classList.add('visible');
         console.error(error);
     }
 }
@@ -159,7 +178,7 @@ function displayHourlyForecast(hourly) {
         html += `
             <div class="forecast-item">
                 <p>${time.getHours()}:00</p>
-                ${createIcon(weatherInfo.icon)}
+                ${createIcon(weatherInfo.icon, 'forecast-icon')}
                 <p>${Math.round(hourly.temperature_2m[i])}°C</p>
                 <div class="precip-bar-container">
                     <div class="precip-bar" style="height: ${precip_prob}%;"></div>
@@ -181,7 +200,7 @@ function displayDailyForecast(daily) {
         html += `
             <div class="forecast-item">
                 <p>${date.toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                ${createIcon(weatherInfo.icon)}
+                ${createIcon(weatherInfo.icon, 'forecast-icon')}
                 <p>${Math.round(daily.temperature_2m_max[i])}° / ${Math.round(daily.temperature_2m_min[i])}°</p>
             </div>
         `;
