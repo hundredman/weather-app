@@ -1,6 +1,6 @@
 # 🔮 Crystal Cast: 날씨 웹 앱
 
-![Crystal Cast App Screenshot - Placeholder for actual screenshot](https://via.placeholder.com/800x450?text=Crystal+Cast+App+Screenshot)
+![Crystal Cast App Screenshot](screenshots/app-screenshot.png)
 
 ## 💡 프로젝트 소개
 
