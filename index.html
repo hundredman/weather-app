@@ -1,20 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Weather Checker</title>
-        <link rel="stylesheet" href="style.css" />
-    </head>
-    <body>
-        <div class="container">
-            <h1>Weather Checker</h1>
-            <input id="locInput" placeholder="Enter a location">
-            <button id="searchButton">Search</button>
-            <div id="loader" class="loader" style="display: none;"></div>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Glass Weather</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="weather-app">
+        <div class="search-bar">
+            <input id="locInput" type="text" placeholder="Enter a location...">
+            <button id="searchButton"><i data-feather="search"></i></button>
+        </div>
+
+        <div id="loader" class="loader" style="display: none;"></div>
+
+        <div class="weather-content">
             <div id="weatherDiv"></div>
             <div id="hourly-forecast"></div>
             <div id="daily-forecast"></div>
         </div>
-        <script src="main.js"></script>
-    </body>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
 </html>
