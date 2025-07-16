@@ -1,7 +1,24 @@
 const input = document.getElementById("locInput");
 const button = document.getElementById("searchButton");
+const clearButton = document.getElementById("clearSearchButton");
 const weatherApp = document.querySelector('.weather-app');
-const unsplashAccessKey = 'S-JGWTKlDt7pIdCYOvApqDfezdgvE-qxldkdwfDqs8w';
+const unsplashAccessKey = UNSPLASH_ACCESS_KEY;
+
+// Event listener for input to show/hide clear button
+input.addEventListener("input", function() {
+    if (input.value.length > 0) {
+        clearButton.style.display = "block";
+    } else {
+        clearButton.style.display = "none";
+    }
+});
+
+// Event listener for clear button
+clearButton.addEventListener("click", function() {
+    input.value = ""; // Clear the input
+    clearButton.style.display = "none"; // Hide the clear button
+    getWeather(); // Fetch weather for current location
+});
 
 input.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
@@ -49,7 +66,7 @@ async function getBackgroundImage(query) {
     }
 
     try {
-        const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&orientation=landscape&client_id=${unsplashAccessKey}`);
+        const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`);
         const data = await response.json();
         if (data.urls && data.urls.regular) {
             const imageUrl = data.urls.regular;

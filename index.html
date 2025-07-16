@@ -8,13 +8,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div class="weather-app-container">
         <div class="search-bar">
-            <input id="locInput" type="text" placeholder="Enter a location...">
+            <div class="input-wrapper">
+                <input id="locInput" type="text" placeholder="Enter a location...">
+                <button id="clearSearchButton" class="clear-search-button" style="display: none;"><i data-feather="x-circle"></i></button>
+            </div>
             <button id="searchButton"><i data-feather="search"></i></button>
         </div>
 
@@ -31,7 +35,9 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script src="main.js"></script>
+    
     <script>
         feather.replace();
     </script>
