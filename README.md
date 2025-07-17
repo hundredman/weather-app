@@ -61,62 +61,85 @@
 
 ## 🔑 API 키 안전하게 사용하기 (GitHub Pages 배포 시)
 
-이 프로젝트는 Unsplash API 키를 사용합니다. GitHub Pages 같은 곳에 올릴 때 좀 더 안전하게 관리하는 방법이 있습니다.
+이 프로젝트는 Unsplash API 키를 사용합니다. GitHub Pages 같은 곳에 올릴 때 API 키를 안전하게 관리하는 방법이 있습니다.
 
-1.  **Unsplash에서 도메인 제한 걸기:**
-    *   Unsplash 개발자 대시보드에 가서, 여러분의 Access Key가 `https://<여러분의-GitHub-사용자명>.github.io` (또는 여러분이 쓰는 다른 도메인)에서만 작동하도록 설정하십시오.
-
-2.  **GitHub Secrets에 키 숨기기:**
+1.  **GitHub Secrets에 키 숨기기:**
     *   GitHub 저장소 `Settings` > `Secrets and variables` > `Actions`로 들어가서, `UNSPLASH_ACCESS_KEY`라는 이름으로 여러분의 Unsplash Access Key를 저장하십시오.
 
-3.  **`.gitignore`에 `config.js` 다시 추가하기:**
+2.  **`.gitignore`에 `config.js` 추가하기:**
     *   `config.js` 파일이 실수로 Git 저장소에 올라가지 않도록 `.gitignore`에 `config.js`를 추가하십시오.
     ```
     # .gitignore
     config.js
     ```
 
-4.  **GitHub Actions로 자동 배포 설정:**
-    *   프로젝트 폴더 안에 `.github/workflows/deploy.yml` 파일을 만들고 아래 내용을 넣으십시오. 이 워크플로우는 여러분이 코드를 `main` 브랜치에 푸시될 때마다 GitHub Secrets에서 키를 가져와 `config.js`를 만들고, 자동으로 GitHub Pages에 배포할 것입니다.
+3.  **GitHub Actions로 자동 배포 설정:**
+    *   프로젝트 폴더 안에 `.github/workflows/deploy.yml` 파일을 만들거나 수정하고 아래 내용을 넣으십시오. 이 워크플로우는 여러분이 코드를 `main` 브랜치에 푸시될 때마다 GitHub Secrets에서 키를 가져와 `config.js`를 만들고, 자동으로 GitHub Pages에 배포할 것입니다.
 
     ```yaml
     # .github/workflows/deploy.yml
-    name: GitHub Pages로 배포하기
+    name: Deploy to GitHub Pages
 
     on:
       push:
         branches:
-          - main
+          - main # main 브랜치에 푸시될 때마다 워크플로우 실행
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     jobs:
       build-and-deploy:
         runs-on: ubuntu-latest
+        environment:
+          name: github-pages
+        permissions:
+          contents: read
+          pages: write
+          id-token: write
 
         steps:
-        - name: 코드 가져오기
+        - name: Checkout code
           uses: actions/checkout@v4
 
-        - name: API 키로 config.js 파일 만들기
+        - name: Create config.js with API Key
           run: |
             echo "const UNSPLASH_ACCESS_KEY = '${{ secrets.UNSPLASH_ACCESS_KEY }}';" > config.js
           env:
             UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
-        - name: GitHub Pages 설정
+        - name: Prepare distribution
+          run: |
+            mkdir dist
+            cp index.html dist/
+            cp main.js dist/
+            cp style.css dist/
+            cp config.js dist/
+            cp favicon.svg dist/
+            cp LICENSE dist/ 2>/dev/null || true
+            cp README.md dist/ 2>/dev/null || true
+            cp -r screenshots dist/ 2>/dev/null || true
+
+        - name: Setup Pages
           uses: actions/configure-pages@v4
 
-        - name: 배포할 파일 업로드
+        - name: Upload artifact
           uses: actions/upload-pages-artifact@v3
           with:
-            path: './'
+            path: './dist' # dist 디렉토리를 아티팩트로 업로드
+            name: github-pages # 아티팩트 이름 지정
 
-        - name: GitHub Pages에 배포
+        - name: Deploy to GitHub Pages
           id: deployment
           uses: actions/deploy-pages@v4
+          with:
+            artifact_name: github-pages # 배포할 아티팩트 이름 지정
     ```
 
-5.  **GitHub Pages 설정 확인:**
-    *   GitHub 저장소 `Settings` > `Pages`에서 `Source`를 `Deploy from a branch`, `Branch`를 `gh-pages` (또는 `main`)로 설정하십시오.
+4.  **GitHub Pages 설정 확인:**
+    *   GitHub 저장소 `Settings` > `Pages`에서 `Source`를 **`GitHub Actions`** 로 설정하십시오.
 
 ## 🤝 함께 만들어가요!
 
