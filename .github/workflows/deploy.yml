@@ -30,17 +30,26 @@ jobs:
       env:
         UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
+    - name: Prepare distribution
+      run: |
+        mkdir dist
+        cp index.html dist/
+        cp main.js dist/
+        cp style.css dist/
+        cp config.js dist/
+        cp favicon.svg dist/
+        cp LICENSE dist/ 2>/dev/null || true
+        cp README.md dist/ 2>/dev/null || true
+        cp -r screenshots dist/ 2>/dev/null || true
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './' # 프로젝트의 모든 파일을 아티팩트로 업로드
+        path: './dist' # dist 디렉토리를 아티팩트로 업로드
         name: github-pages # 아티팩트 이름 지정
-
-    - name: List files before upload
-      run: ls -R
 
     - name: Deploy to GitHub Pages
       id: deployment
