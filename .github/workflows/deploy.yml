@@ -38,6 +38,9 @@ jobs:
       env:
         UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
+    - name: Create test.txt
+      run: echo "This is a test file." > test.txt
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
