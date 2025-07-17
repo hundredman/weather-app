@@ -30,9 +30,6 @@ jobs:
       env:
         UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
-    - name: Create test.txt
-      run: echo "This is a test file." > test.txt
-
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
@@ -40,6 +37,7 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: './' # 프로젝트의 모든 파일을 아티팩트로 업로드
+        name: github-pages # 아티팩트 이름 지정
 
     - name: List files before upload
       run: ls -R
@@ -47,3 +45,5 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+      with:
+        artifact_name: github-pages # 배포할 아티팩트 이름 지정
