@@ -35,8 +35,9 @@ jobs:
     - name: Build and prepare for deployment
       run: |
         mkdir _site
-        cp -r ./* _site/
-        # .DS_Store, .gitignore 등 숨김 파일도 복사 (필요한 경우)
+        shopt -s extglob # 확장 글로빙 활성화
+        cp -r !(config.js|_site) _site/ # 'config.js'와 '_site' 디렉토리를 제외한 모든 파일/디렉토리 복사
+        # .DS_Store, .gitignore 등 숨김 파일도 복사
         cp .DS_Store _site/ 2>/dev/null || true
         cp .gitignore _site/ 2>/dev/null || true
 
