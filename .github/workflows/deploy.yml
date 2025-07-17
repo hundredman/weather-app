@@ -32,14 +32,11 @@ jobs:
       env:
         UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
-    - name: Build and prepare for deployment
+    - name: Create config.js with API Key
       run: |
-        mkdir _site
-        shopt -s extglob # 확장 글로빙 활성화
-        cp -r !(config.js|_site) _site/ # 'config.js'와 '_site' 디렉토리를 제외한 모든 파일/디렉토리 복사
-        # .DS_Store, .gitignore 등 숨김 파일도 복사
-        cp .DS_Store _site/ 2>/dev/null || true
-        cp .gitignore _site/ 2>/dev/null || true
+        echo "const UNSPLASH_ACCESS_KEY = '${{ secrets.UNSPLASH_ACCESS_KEY }}';" > config.js
+      env:
+        UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -47,7 +44,10 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './_site' # _site 디렉토리를 아티팩트로 업로드
+        path: './' # 프로젝트의 모든 파일을 아티팩트로 업로드
+
+    - name: List files before upload
+      run: ls -R
 
     - name: Deploy to GitHub Pages
       id: deployment
