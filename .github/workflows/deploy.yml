@@ -5,6 +5,11 @@ on:
     branches:
       - main # main 브랜치에 푸시될 때마다 워크플로우 실행
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
