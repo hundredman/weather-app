@@ -29,6 +29,8 @@ jobs:
     - name: Create config.js with API Key
       run: |
         echo "const UNSPLASH_ACCESS_KEY = '${{ secrets.UNSPLASH_ACCESS_KEY }}';" > config.js
+        ls -l config.js # config.js 파일이 생성되었는지 확인
+        cat config.js # config.js 파일 내용 확인
       env:
         UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
 
