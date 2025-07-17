@@ -2,7 +2,7 @@ const input = document.getElementById("locInput");
 const button = document.getElementById("searchButton");
 const clearButton = document.getElementById("clearSearchButton");
 const weatherApp = document.querySelector('.weather-app');
-const unsplashAccessKey = UNSPLASH_ACCESS_KEY;
+
 
 // Event listener for input to show/hide clear button
 input.addEventListener("input", function() {
@@ -66,17 +66,20 @@ async function getBackgroundImage(query) {
     }
 
     try {
-        const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`);
+        // 서버리스 프록시 엔드포인트 호출
+        const response = await fetch(`/api/unsplash-proxy?query=${encodeURIComponent(query)}`);
         const data = await response.json();
-        if (data.urls && data.urls.regular) {
-            const imageUrl = data.urls.regular;
+
+        if (response.ok && data.imageUrl) {
+            const imageUrl = data.imageUrl;
             localStorage.setItem(cacheKey, JSON.stringify({ url: imageUrl, timestamp: Date.now() }));
             return imageUrl;
         } else {
+            console.error('Error from proxy:', data.error || 'Unknown error');
             return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
         }
     } catch (error) {
-        console.error('Error fetching from Unsplash:', error);
+        console.error('Error fetching from proxy:', error);
         return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
     }
 }
