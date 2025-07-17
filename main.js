@@ -1,8 +1,9 @@
 const unsplashAccessKey = UNSPLASH_ACCESS_KEY;
 
-
-
-// Event listener for input to show/hide clear button
+const input = document.getElementById("locInput");
+const button = document.getElementById("searchButton");
+const clearButton = document.getElementById("clearSearchButton");
+const weatherApp = document.querySelector('.weather-app');
 input.addEventListener("input", function() {
     if (input.value.length > 0) {
         clearButton.style.display = "block";
