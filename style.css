@@ -286,14 +286,116 @@ h3 {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    .weather-app {
-        grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+    body {
+        /* Align container to the top on smaller screens */
+        align-items: flex-start;
+        padding-top: 20px;
+        padding-bottom: 20px;
         height: auto;
-        max-height: none;
+        min-height: 100vh;
+    }
+
+    .weather-app-container {
+        /* Adjust container to fit screen better */
+        height: calc(100vh - 40px);
+    }
+
+    .search-bar {
+        margin-top: 15px; /* Add top margin for tablets */
+    }
+
+    .weather-app {
+        /* Convert to a single-column flex layout */
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: none;
+
+        /* Make the container itself scrollable, keeping the border intact */
+        overflow-y: auto;
+    }
+
+    .main-panel, .side-panel {
+        /* Disable individual panel scrolling */
+        overflow-y: visible;
+        height: auto;
     }
 
     .main-panel {
+        margin-top: 15px; /* Add top margin for tablets */
         margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-bar {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px; /* Adjust margin for mobile layout */
+    }
+
+    .input-wrapper {
+        width: 100%;
+    }
+
+    .search-bar button {
+        margin-left: 0;
+    }
+
+    #weatherDiv h2 {
+        font-size: 2.2rem;
+    }
+
+    .main-weather-icon {
+        width: 90px;
+        height: 90px;
+        margin: 20px 0;
+    }
+
+    .weather-text p:first-child {
+        font-size: 3rem;
+    }
+
+    .weather-text p:last-child {
+        font-size: 1.1rem;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .weather-app-container {
+        height: calc(100vh - 20px);
+    }
+
+    .weather-app {
+        padding: 15px;
+    }
+
+    #weatherDiv h2 {
+        font-size: 2rem;
+    }
+
+    .main-weather-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .weather-text p:first-child {
+        font-size: 2.8rem;
+    }
+
+    .weather-text p:last-child {
+        font-size: 1rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
     }
 }

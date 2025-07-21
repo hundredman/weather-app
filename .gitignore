@@ -1,2 +1,11 @@
-
 config.js
+
+# Presentation files
+presentation_ko.md
+presentation_en.md
+marp/
+
+# Node modules
+node_modules/
+package.json
+package-lock.json
