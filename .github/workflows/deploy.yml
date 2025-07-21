@@ -42,6 +42,9 @@ jobs:
         cp README.md dist/ 2>/dev/null || true
         cp -r screenshots dist/ 2>/dev/null || true
 
+    - name: List dist directory contents
+      run: ls -R dist
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
