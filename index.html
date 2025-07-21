@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crystal Cast</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/feather-icons"></script>
+    
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div class="weather-app-container">
+        
         <div class="search-bar">
             <div class="input-wrapper">
                 <input id="locInput" type="text" placeholder="Enter a location...">
@@ -25,9 +28,11 @@
         <div id="loader" class="loader" style="display: none;"></div>
 
         <div class="weather-app">
+            
             <main class="main-panel">
                 <div id="weatherDiv"></div>
             </main>
+            
             <aside class="side-panel">
                 <div id="hourly-forecast"></div>
                 <div id="daily-forecast"></div>
@@ -35,7 +40,6 @@
         </div>
     </div>
 
-    
     <script src="config.js"></script>
     <script src="main.js"></script>
     

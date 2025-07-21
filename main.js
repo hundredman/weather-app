@@ -1,31 +1,40 @@
+// Unsplash API 키 (config.js에서 로드)
 const unsplashAccessKey = UNSPLASH_ACCESS_KEY;
 
+// DOM 요소 가져오기
 const input = document.getElementById("locInput");
 const button = document.getElementById("searchButton");
 const clearButton = document.getElementById("clearSearchButton");
 const weatherApp = document.querySelector('.weather-app');
-input.addEventListener("input", function() {
-    if (input.value.length > 0) {
-        clearButton.style.display = "block";
-    } else {
-        clearButton.style.display = "none";
-    }
+
+// --- 이벤트 리스너 설정 ---
+
+// 검색창 입력 시 'X' 버튼 표시/숨김
+input.addEventListener("input", () => {
+    clearButton.style.display = input.value.length > 0 ? "block" : "none";
 });
 
-// Event listener for clear button
-clearButton.addEventListener("click", function() {
-    input.value = ""; // Clear the input
-    clearButton.style.display = "none"; // Hide the clear button
-    getWeather(); // Fetch weather for current location
+// 'X' 버튼 클릭 시 입력 내용 지우고 현재 위치 날씨 로드
+clearButton.addEventListener("click", () => {
+    input.value = "";
+    clearButton.style.display = "none";
+    getWeather();
 });
 
-input.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        getWeather();
-    }
+// Enter 키 또는 검색 버튼 클릭 시 날씨 검색
+input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") getWeather();
 });
 button.addEventListener("click", getWeather);
 
+// 페이지 첫 로드 시 현재 위치 날씨 가져오기
+window.addEventListener("load", () => {
+    getWeather();
+    feather.replace();
+});
+
+
+// Open-Meteo 날씨 코드와 앱 내부 데이터를 매핑
 const weatherConditions = {
     0: { icon: 'sun', text: 'Clear Sky', query: 'clear blue sky' },
     1: { icon: 'sun', text: 'Mainly Clear', query: 'clear sky' },
@@ -48,18 +57,25 @@ const weatherConditions = {
     95: { icon: 'cloud-lightning', text: 'Thunderstorm', query: 'thunderstorm lightning' },
 };
 
+/**
+ * 날씨 코드를 받아 해당하는 아이콘, 텍스트, 검색어를 반환합니다.
+ * @param {number} code - WMO 날씨 코드
+ */
 function getWeatherInfo(code) {
     return weatherConditions[code] || { icon: 'help-circle', text: 'Unknown', query: 'weather' };
 }
 
+/**
+ * Unsplash API로 배경 이미지를 가져옵니다. (1시간 캐싱 적용)
+ * @param {string} query - 이미지 검색어
+ */
 async function getBackgroundImage(query) {
     const cacheKey = `bg_image_${query.replace(/\s/g, '_')}`;
     const cachedData = localStorage.getItem(cacheKey);
 
     if (cachedData) {
         const { url, timestamp } = JSON.parse(cachedData);
-        // Cache for 1 hour
-        if (Date.now() - timestamp < 3600000) {
+        if (Date.now() - timestamp < 3600000) { // 1시간
             return url;
         }
     }
@@ -71,15 +87,20 @@ async function getBackgroundImage(query) {
             const imageUrl = data.urls.regular;
             localStorage.setItem(cacheKey, JSON.stringify({ url: imageUrl, timestamp: Date.now() }));
             return imageUrl;
-        } else {
-            return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
         }
+        // API 응답 실패 시 기본 이미지 반환
+        return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
     } catch (error) {
         console.error('Error fetching from Unsplash:', error);
+        // 네트워크 에러 시 기본 이미지 반환
         return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
     }
 }
 
+/**
+ * 이미지를 미리 로드하여 부드러운 배경 전환을 돕습니다.
+ * @param {string} url - 이미지 URL
+ */
 function preloadImage(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -89,10 +110,18 @@ function preloadImage(url) {
     });
 }
 
+/**
+ * Feather 아이콘 HTML을 생성합니다.
+ * @param {string} iconName - 아이콘 이름
+ * @param {string} className - 적용할 CSS 클래스
+ */
 function createIcon(iconName, className) {
     return `<i data-feather="${iconName}" class="${className}"></i>`;
 }
 
+/**
+ * 날씨 정보를 가져와 화면에 표시하는 메인 함수
+ */
 async function getWeather() {
     const loc = input.value.trim();
     const resultDiv = document.getElementById("weatherDiv");
@@ -100,6 +129,7 @@ async function getWeather() {
     const dailyDiv = document.getElementById("daily-forecast");
     const loader = document.getElementById("loader");
 
+    // 1. UI 초기화 (로딩 스피너 표시)
     weatherApp.classList.remove('visible');
     loader.style.display = "block";
     resultDiv.innerHTML = "";
@@ -109,16 +139,14 @@ async function getWeather() {
     try {
         let lat, lon, display_name;
 
+        // 2. 위치 정보 가져오기 (검색어 또는 Geolocation)
         if (loc) {
             const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc)}&format=json`;
             const geoRes = await fetch(geoUrl);
             const geoData = await geoRes.json();
 
             if (!geoData.length) {
-                resultDiv.innerHTML = "<h2>Location not found</h2>";
-                loader.style.display = "none";
-                weatherApp.classList.add('visible');
-                return;
+                throw new Error("Location not found");
             }
             ({ lat, lon, display_name } = geoData[0]);
         } else {
@@ -130,28 +158,26 @@ async function getWeather() {
             display_name = "Current Location";
         }
 
+        // 3. 날씨 API 호출
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,temperature_2m&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
         const weatherRes = await fetch(weatherUrl);
         const weatherData = await weatherRes.json();
         const { current, hourly, daily } = weatherData;
         const weatherInfo = getWeatherInfo(current.weather_code);
 
+        // 4. 배경 이미지 사전 로딩 및 적용
         const backgroundImageUrl = await getBackgroundImage(weatherInfo.query);
         await preloadImage(backgroundImageUrl);
         document.body.style.backgroundImage = `url('${backgroundImageUrl}')`;
 
-        let formatted_display_name;
-        if (display_name === "Current Location") {
-            formatted_display_name = display_name;
-        } else {
+        // 5. 지역 이름 포맷팅
+        let formatted_display_name = display_name;
+        if (display_name !== "Current Location") {
             const parts = display_name.split(',').map(part => part.trim());
-            if (parts.length > 1) {
-                formatted_display_name = `${parts[0]}, ${parts[parts.length - 1]}`;
-            } else {
-                formatted_display_name = display_name;
-            }
+            formatted_display_name = parts.length > 1 ? `${parts[0]}, ${parts[parts.length - 1]}` : display_name;
         }
 
+        // 6. 현재 날씨 UI 업데이트
         resultDiv.innerHTML = `
             <h2>${formatted_display_name}</h2>
             ${createIcon(weatherInfo.icon, 'main-weather-icon')}
@@ -161,27 +187,30 @@ async function getWeather() {
             </div>
         `;
 
+        // 7. 예보 UI 업데이트
         displayHourlyForecast(hourly);
         displayDailyForecast(daily);
 
+    } catch (error) {
+        resultDiv.innerHTML = `<h2>Could not fetch weather data.</h2><p>${error.message}</p>`;
+        console.error(error);
+    } finally {
+        // 8. 로딩 완료 후 UI 표시
         loader.style.display = "none";
         weatherApp.classList.add('visible');
         feather.replace();
-
-    } catch (error) {
-        loader.style.display = "none";
-        resultDiv.innerHTML = "<h2>Could not fetch weather data.</h2><p>Please try again or check your connection.</p>";
-        weatherApp.classList.add('visible');
-        console.error(error);
     }
 }
 
+/**
+ * 시간별 예보를 화면에 표시합니다.
+ * @param {object} hourly - 시간별 예보 데이터
+ */
 function displayHourlyForecast(hourly) {
     const forecastDiv = document.getElementById("hourly-forecast");
     let html = "<h3>Next 24 Hours</h3><div class='forecast-container'>";
     const now = new Date();
-    const currentHour = now.getHours();
-    const startIndex = hourly.time.findIndex(t => new Date(t).getHours() === currentHour);
+    const startIndex = hourly.time.findIndex(t => new Date(t).getHours() === now.getHours());
 
     if (startIndex === -1) return;
 
@@ -203,10 +232,13 @@ function displayHourlyForecast(hourly) {
             </div>
         `;
     }
-    html += "</div>";
-    forecastDiv.innerHTML = html;
+    forecastDiv.innerHTML = html + "</div>";
 }
 
+/**
+ * 주간 예보를 화면에 표시합니다.
+ * @param {object} daily - 주간 예보 데이터
+ */
 function displayDailyForecast(daily) {
     const forecastDiv = document.getElementById("daily-forecast");
     let html = "<h3>This Week</h3><div class='forecast-container'>";
@@ -221,11 +253,5 @@ function displayDailyForecast(daily) {
             </div>
         `;
     }
-    html += "</div>";
-    forecastDiv.innerHTML = html;
+    forecastDiv.innerHTML = html + "</div>";
 }
-
-window.addEventListener("load", () => {
-    getWeather();
-    feather.replace(); 
-});
