@@ -12,6 +12,7 @@
 - **Global Search**: Look up weather for any city worldwide.
 - **Geolocation**: Automatically shows weather for your current location.
 - **Dynamic Design**: Background and icons change based on the weather.
+- **Search History**: Quickly access your past 5 searches.
 - **Responsive**: Fully optimized for both desktop and mobile viewing.
 
 ## 🛠️ Tech Stack
