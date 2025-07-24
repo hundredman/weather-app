@@ -15,16 +15,17 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    height: 100vh;
+    min-height: 100vh; /* Ensure body takes at least full viewport height */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center horizontally */
     background-size: cover;
     background-position: center;
     transition: background-image 0.5s ease-in-out;
     color: var(--primary-color);
     position: relative;
     padding: 20px;
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
 body::before {
@@ -45,6 +46,7 @@ body::before {
     max-height: 850px;
     display: flex;
     flex-direction: column;
+    margin-top: 20px; /* Added top margin */
 }
 
 .search-bar {
@@ -283,6 +285,34 @@ h3 {
 @keyframes spin {
     0% { transform: translate(-50%, -50%) rotate(0deg); }
     100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .weather-app {
+        grid-template-columns: 1fr; /* Stack panels vertically */
+        grid-template-rows: auto auto; /* Allow panels to take content height */
+        gap: 20px; /* Adjust gap for vertical stacking */
+        padding: 20px; /* Adjust padding for smaller screens */
+        height: auto; /* Allow height to adjust based on content */
+        max-height: unset; /* Remove max-height constraint */
+    }
+
+    .main-panel {
+        max-height: 75vh; /* Set a larger max height for main panel */
+        overflow-y: auto; /* Make main panel scrollable if content exceeds max-height */
+    }
+
+    .side-panel {
+        max-height: 60vh; /* Set a max height for side panel */
+        overflow-y: visible; /* Remove vertical scroll from side panel */
+        overflow-x: auto; /* Keep horizontal scroll for side panel */
+    }
+
+    .weather-app-container {
+        height: auto;
+        max-height: unset;
+    }
 }
 
 /* --- Search History --- */
