@@ -285,117 +285,79 @@ h3 {
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    body {
-        /* Align container to the top on smaller screens */
-        align-items: flex-start;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        height: auto;
-        min-height: 100vh;
-    }
-
-    .weather-app-container {
-        /* Adjust container to fit screen better */
-        height: calc(100vh - 40px);
-    }
-
-    .search-bar {
-        margin-top: 15px; /* Add top margin for tablets */
-    }
-
-    .weather-app {
-        /* Convert to a single-column flex layout */
-        display: flex;
-        flex-direction: column;
-        grid-template-columns: none;
-
-        /* Make the container itself scrollable, keeping the border intact */
-        overflow-y: auto;
-    }
-
-    .main-panel, .side-panel {
-        /* Disable individual panel scrolling */
-        overflow-y: visible;
-        height: auto;
-    }
-
-    .main-panel {
-        margin-top: 15px; /* Add top margin for tablets */
-        margin-bottom: 30px;
-    }
+/* --- Search History --- */
+.search-history-container {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Position below the search bar */
+    left: 0;
+    width: 100%; /* Match the width of the parent (.search-bar) */
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    color: var(--primary-color);
+    margin-top: 5px; /* Small gap below search bar */
 }
 
-@media (max-width: 768px) {
-    .search-bar {
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px; /* Adjust margin for mobile layout */
-    }
-
-    .input-wrapper {
-        width: 100%;
-    }
-
-    .search-bar button {
-        margin-left: 0;
-    }
-
-    #weatherDiv h2 {
-        font-size: 2.2rem;
-    }
-
-    .main-weather-icon {
-        width: 90px;
-        height: 90px;
-        margin: 20px 0;
-    }
-
-    .weather-text p:first-child {
-        font-size: 3rem;
-    }
-
-    .weather-text p:last-child {
-        font-size: 1.1rem;
-    }
-
-    h3 {
-        font-size: 1.2rem;
-    }
+.history-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s ease;
 }
 
-@media (max-width: 480px) {
-    body {
-        padding: 10px;
-    }
-    
-    .weather-app-container {
-        height: calc(100vh - 20px);
-    }
+.history-item:hover,
+.history-item.active {
+    background: rgba(255, 255, 255, 0.1);
+}
 
-    .weather-app {
-        padding: 15px;
-    }
+.delete-history-item {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--secondary-color);
+    padding: 0 5px;
+}
 
-    #weatherDiv h2 {
-        font-size: 2rem;
-    }
+.delete-history-item:hover {
+    color: var(--primary-color);
+}
 
-    .main-weather-icon {
-        width: 80px;
-        height: 80px;
-    }
+.search-history-footer {
+    padding: 10px 15px;
+    text-align: right;
+    border-top: 1px solid var(--glass-border);
+}
 
-    .weather-text p:first-child {
-        font-size: 2.8rem;
-    }
+#clear-history {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--secondary-color);
+    font-size: 0.9em;
+    transition: color 0.2s ease;
+}
 
-    .weather-text p:last-child {
-        font-size: 1rem;
-    }
+#clear-history:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
 
-    h3 {
-        font-size: 1.1rem;
-    }
+/* Custom scrollbar for search history */
+.search-history-container::-webkit-scrollbar {
+    width: 6px;
+}
+.search-history-container::-webkit-scrollbar-thumb {
+    background-color: var(--glass-border);
+    border-radius: 6px;
+}
+.search-history-container::-webkit-scrollbar-track {
+    background: transparent;
 }
