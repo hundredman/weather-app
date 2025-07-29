@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM 요소 가져오기
+    // DOM Elements
     const locInput = document.getElementById("locInput");
     const searchButton = document.getElementById("searchButton");
     const clearSearchButton = document.getElementById("clearSearchButton");
@@ -12,15 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById("loader");
 
     let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-
-    // --- 검색 기록 관련 함수 ---
-
     let activeHistoryIndex = -1;
+
+    // --- SEARCH HISTORY FUNCTIONS ---
 
     function displaySearchHistory(filteredHistory) {
         searchHistoryContainer.innerHTML = '';
-        activeHistoryIndex = -1; // Reset active index whenever history is displayed
-        const history = (filteredHistory || searchHistory).slice(0, 4); // Limit to 4 items
+        activeHistoryIndex = -1;
+        const history = (filteredHistory || searchHistory).slice(0, 4); 
 
         if (history.length > 0) {
             history.forEach(term => {
@@ -42,18 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteButton.innerHTML = '&times;';
                 deleteButton.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // Remove the item from the main history array
                     searchHistory = searchHistory.filter(t => t !== term);
                     localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-
-                    // Get the current filter term from the input
                     const currentFilter = locInput.value.toLowerCase();
-                    
-                    // Filter the (now updated) search history
-                    const filteredHistory = searchHistory.filter(t => t.toLowerCase().includes(currentFilter));
-                    
-                    // Re-display the history with the filter still applied
-                    displaySearchHistory(filteredHistory);
+                    const filtered = searchHistory.filter(t => t.toLowerCase().includes(currentFilter));
+                    displaySearchHistory(filtered);
                 });
 
                 historyItem.appendChild(deleteButton);
@@ -90,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 검색 실행 함수 ---
+    // --- SEARCH EXECUTION ---
     
     function handleSearch() {
         const searchTerm = locInput.value.trim();
@@ -101,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searchHistoryContainer.style.display = 'none';
     }
 
-    // --- 이벤트 리스너 설정 ---
+    // --- EVENT LISTENERS ---
 
     function setSearchHistoryPosition() {
         const inputWrapper = document.querySelector('.input-wrapper');
@@ -133,21 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     locInput.addEventListener("keydown", (event) => {
         const items = searchHistoryContainer.querySelectorAll('.history-item');
+        if (items.length === 0) return;
 
         if (event.key === "ArrowDown") {
             event.preventDefault();
-            if (items.length === 0) return; // Only return if no items for arrow navigation
-            activeHistoryIndex++;
-            if (activeHistoryIndex >= items.length) activeHistoryIndex = 0;
+            activeHistoryIndex = (activeHistoryIndex + 1) % items.length;
             updateActiveHistoryItem(items);
         } else if (event.key === "ArrowUp") {
             event.preventDefault();
-            if (items.length === 0) return; // Only return if no items for arrow navigation
-            activeHistoryIndex--;
-            if (activeHistoryIndex < 0) activeHistoryIndex = items.length - 1;
+            activeHistoryIndex = (activeHistoryIndex - 1 + items.length) % items.length;
             updateActiveHistoryItem(items);
         } else if (event.key === "Enter") {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
             if (activeHistoryIndex > -1) {
                 items[activeHistoryIndex].click();
             } else {
@@ -169,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clearSearchButton.addEventListener("click", () => {
         locInput.value = "";
         clearSearchButton.style.display = "none";
-        getWeather(); // 기본 위치 날씨 다시 로드
+        getWeather(); // Load weather for default location
     });
 
     searchButton.addEventListener('click', handleSearch);
@@ -180,13 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 페이지 첫 로드 시 현재 위치 날씨 가져오기
     window.addEventListener("load", () => {
-        getWeather();
+        getWeather(); // Fetch weather on initial load
         feather.replace();
     });
 
-    // --- 날씨 API 및 데이터 처리 ---
+    // --- WEATHER API & DATA HANDLING ---
 
     const weatherConditions = {
         0: { icon: 'sun', text: 'Clear Sky', query: 'clear blue sky' },
@@ -220,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (cachedData) {
             const { url, timestamp } = JSON.parse(cachedData);
-            if (Date.now() - timestamp < 3600000) {
+            if (Date.now() - timestamp < 3600000) { // 1 hour cache
                 return url;
             }
         }
@@ -233,10 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem(cacheKey, JSON.stringify({ url: imageUrl, timestamp: Date.now() }));
                 return imageUrl;
             }
-            return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
+            return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop'; // Fallback image
         } catch (error) {
             console.error('Error fetching from Unsplash:', error);
-            return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop';
+            return 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?q=80&w=2865&auto=format&fit=crop'; // Fallback image
         }
     }
 
@@ -267,10 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc)}&format=json`;
                 const geoRes = await fetch(geoUrl);
                 const geoData = await geoRes.json();
-
-                if (!geoData.length) {
-                    throw new Error("Location not found");
-                }
+                if (!geoData.length) throw new Error("Location not found");
                 ({ lat, lon, display_name } = geoData[0]);
             } else {
                 const position = await new Promise((resolve, reject) => {

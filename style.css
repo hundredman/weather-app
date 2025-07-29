@@ -1,3 +1,4 @@
+/* --- Variables and Resets --- */
 :root {
     --primary-color: #ffffff;
     --secondary-color: #e0e0e0;
@@ -13,19 +14,20 @@
     box-sizing: border-box;
 }
 
+/* --- General Styles --- */
 body {
     font-family: 'Poppins', sans-serif;
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
+    min-height: 100vh;
     display: flex;
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center horizontally */
+    flex-direction: column;
+    align-items: center;
     background-size: cover;
     background-position: center;
     transition: background-image 0.5s ease-in-out;
     color: var(--primary-color);
     position: relative;
     padding: 20px;
-    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-y: auto;
 }
 
 body::before {
@@ -39,6 +41,7 @@ body::before {
     z-index: -1;
 }
 
+/* --- Layout --- */
 .weather-app-container {
     width: 95%;
     max-width: 1200px;
@@ -46,93 +49,7 @@ body::before {
     max-height: 850px;
     display: flex;
     flex-direction: column;
-    margin-top: 20px; /* Added top margin */
-}
-
-.search-bar {
-    display: flex;
-    margin-bottom: 20px;
-    flex-shrink: 0;
-}
-
-.input-wrapper {
-    flex-grow: 1;
-    position: relative;
-    display: flex;
-    border-radius: 15px;
-    border: 1px solid var(--glass-border);
-    overflow: hidden; /* Ensures inner elements respect border-radius */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Add transition */
-}
-
-.input-wrapper:focus-within {
-    border-color: var(--primary-color); /* White border on focus */
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8); /* Thinnest white glow on focus */
-}
-
-.search-bar input {
-    flex-grow: 1;
-    padding: 15px;
-    border: none;
-    background: var(--glass-bg);
-    border-radius: 15px; /* Keep this for visual consistency */
-    color: var(--primary-color);
-    font-size: 16px;
-    text-shadow: none;
-    padding-right: 45px; /* Space for the clear button + 15px padding */
-}
-
-.search-bar input::placeholder {
-    color: var(--secondary-color);
-}
-
-.search-bar input:focus {
-    outline: none; /* Remove default outline */
-}
-
-.search-bar button {
-    padding: 15px;
-    border: none;
-    background: var(--glass-bg);
-    cursor: pointer;
-    color: var(--primary-color);
-    border: 1px solid var(--glass-border);
-    border-left: none;
-    border-radius: 15px; /* Make search button rounded */
-    margin-left: 10px; /* Space between input and search button */
-    transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease; /* Add transitions */
-}
-
-.search-bar button:hover {
-    background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
-    color: var(--primary-color);
-}
-
-.search-bar button:active {
-    transform: scale(0.98); /* Slight press effect on click */
-    background: rgba(255, 255, 255, 0.3); /* More opaque on active */
-}
-
-.clear-search-button {
-    position: absolute;
-    right: 15px; /* Position inside the input field, 15px from right edge */
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    cursor: pointer;
-    color: var(--secondary-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 100%;
-    z-index: 1;
-}
-
-.clear-search-button:hover {
-    color: var(--primary-color);
+    margin-top: 20px;
 }
 
 .weather-app {
@@ -165,18 +82,94 @@ body::before {
     height: 100%;
 }
 
-/* Custom Scrollbar */
-.main-panel::-webkit-scrollbar, .side-panel::-webkit-scrollbar {
-    width: 8px;
-}
-.main-panel::-webkit-scrollbar-thumb, .side-panel::-webkit-scrollbar-thumb {
-    background-color: var(--glass-border);
-    border-radius: 10px;
-}
-.main-panel::-webkit-scrollbar-track, .side-panel::-webkit-scrollbar-track {
-    background: transparent;
+/* --- Search Bar --- */
+.search-bar {
+    display: flex;
+    margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
+.input-wrapper {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.search-bar input {
+    flex-grow: 1;
+    padding: 15px;
+    border: none;
+    background: var(--glass-bg);
+    border-radius: 15px;
+    color: var(--primary-color);
+    font-size: 16px;
+    text-shadow: none;
+    padding-right: 45px;
+}
+
+.search-bar input::placeholder {
+    color: var(--secondary-color);
+}
+
+.search-bar input:focus {
+    outline: none;
+}
+
+.search-bar button {
+    padding: 15px;
+    border: none;
+    background: var(--glass-bg);
+    cursor: pointer;
+    color: var(--primary-color);
+    border: 1px solid var(--glass-border);
+    border-left: none;
+    border-radius: 15px;
+    margin-left: 10px;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+}
+
+.search-bar button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--primary-color);
+}
+
+.search-bar button:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.clear-search-button {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    cursor: pointer;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 100%;
+    z-index: 1;
+}
+
+.clear-search-button:hover {
+    color: var(--primary-color);
+}
+
+/* --- Main Weather Display --- */
 .main-panel {
     display: flex;
     flex-direction: column;
@@ -211,6 +204,7 @@ body::before {
     font-weight: 500;
 }
 
+/* --- Forecast --- */
 #hourly-forecast, #daily-forecast {
     margin-bottom: 20px;
 }
@@ -270,6 +264,7 @@ h3 {
     font-size: 0.8rem;
 }
 
+/* --- Loader --- */
 .loader {
     border: 4px solid rgba(255, 255, 255, 0.2);
     border-top: 4px solid var(--primary-color);
@@ -287,41 +282,13 @@ h3 {
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .weather-app {
-        grid-template-columns: 1fr; /* Stack panels vertically */
-        grid-template-rows: auto auto; /* Allow panels to take content height */
-        gap: 20px; /* Adjust gap for vertical stacking */
-        padding: 20px; /* Adjust padding for smaller screens */
-        height: auto; /* Allow height to adjust based on content */
-        max-height: unset; /* Remove max-height constraint */
-    }
-
-    .main-panel {
-        max-height: 75vh; /* Set a larger max height for main panel */
-        overflow-y: auto; /* Make main panel scrollable if content exceeds max-height */
-    }
-
-    .side-panel {
-        max-height: 60vh; /* Set a max height for side panel */
-        overflow-y: visible; /* Remove vertical scroll from side panel */
-        overflow-x: auto; /* Keep horizontal scroll for side panel */
-    }
-
-    .weather-app-container {
-        height: auto;
-        max-height: unset;
-    }
-}
-
 /* --- Search History --- */
 .search-history-container {
-    display: none; /* Hidden by default */
+    display: none;
     position: absolute;
-    top: 100%; /* Position below the search bar */
+    top: 100%;
     left: 0;
-    width: 100%; /* Match the width of the parent (.search-bar) */
+    width: 100%;
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -331,7 +298,7 @@ h3 {
     overflow-y: auto;
     z-index: 1000;
     color: var(--primary-color);
-    margin-top: 5px; /* Small gap below search bar */
+    margin-top: 5px;
 }
 
 .history-item {
@@ -380,14 +347,42 @@ h3 {
     text-decoration: underline;
 }
 
-/* Custom scrollbar for search history */
-.search-history-container::-webkit-scrollbar {
-    width: 6px;
+/* --- Scrollbar --- */
+.main-panel::-webkit-scrollbar, .side-panel::-webkit-scrollbar, .search-history-container::-webkit-scrollbar {
+    width: 8px;
 }
-.search-history-container::-webkit-scrollbar-thumb {
+.main-panel::-webkit-scrollbar-thumb, .side-panel::-webkit-scrollbar-thumb, .search-history-container::-webkit-scrollbar-thumb {
     background-color: var(--glass-border);
-    border-radius: 6px;
+    border-radius: 10px;
 }
-.search-history-container::-webkit-scrollbar-track {
+.main-panel::-webkit-scrollbar-track, .side-panel::-webkit-scrollbar-track, .search-history-container::-webkit-scrollbar-track {
     background: transparent;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+    .weather-app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        gap: 20px;
+        padding: 20px;
+        height: auto;
+        max-height: unset;
+    }
+
+    .main-panel {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+    .side-panel {
+        max-height: 60vh;
+        overflow-y: visible;
+        overflow-x: auto;
+    }
+
+    .weather-app-container {
+        height: auto;
+        max-height: unset;
+    }
 }
